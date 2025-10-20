@@ -8,7 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    env:
+      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
     steps:
       - name: Vérification du code source
         uses: actions/checkout@v3
@@ -20,20 +24,25 @@ jobs:
 
       - name: Transfert du projet vers le VPS
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "rm -rf ${{ secrets.VPS_DIR }} && mkdir -p ${{ secrets.VPS_DIR }}"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 
+          "rm -rf ${{ secrets.VPS_DIR }} && mkdir -p ${{ secrets.VPS_DIR }}"
           scp -r ./* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_DIR }}
 
       - name: Installation des dépendances
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cd ${{ secrets.VPS_DIR }} && npm install"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 
+          "cd ${{ secrets.VPS_DIR }} && npm install"
 
       - name: Construction de l'application
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cd ${{ secrets.VPS_DIR }} && npm run build"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 
+          "cd ${{ secrets.VPS_DIR }} && npm run build"
 
       - name: Lancement de l'application
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cd ${{ secrets.VPS_DIR }} && pm2 restart smartdesk || PORT=80 pm2 start ${{ secrets.VPS_DIR }}/build/index.js --name smartdesk"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 
+          "cd ${{ secrets.VPS_DIR }} && pm2 restart smartdesk ||
+          PORT=80 pm2 start ${{ secrets.VPS_DIR }}/build/index.js --name smartdesk"
 
       - name: Confirmation du déploiement
         run: echo "Déploiement terminé"
