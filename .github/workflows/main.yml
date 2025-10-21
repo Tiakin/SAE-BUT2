@@ -26,6 +26,7 @@ jobs:
           MYSQL_USER=${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
           MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+          SPOTIFY_SECRET=${{ secrets.SPOTIFY_SECRET }}
           EOF"
 
       - name: Installation des dépendances
